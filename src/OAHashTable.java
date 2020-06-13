@@ -4,6 +4,7 @@ public abstract class OAHashTable implements IHashTable {
 
     private HashTableElement[] table;
     private static final HashTableElement deleted = new HashTableElement(-1, -1);
+    private int currSize=0;
 
     public OAHashTable(int m) {
         this.table = new HashTableElement[m];
@@ -43,6 +44,7 @@ public abstract class OAHashTable implements IHashTable {
             int ind = Hash(key, i);
             if (table[ind] == null) {
                 table[ind] = hte;
+                currSize++;
                 return;
             } else if (table[ind] == deleted) {
                 // we can not immediately insert at this position,
@@ -57,7 +59,17 @@ public abstract class OAHashTable implements IHashTable {
         }
         if (sawDeleted) {
             table[firstDeletedIndex] = hte;
+            currSize++;
         } else {
+            assert (currSize == table.length);
+            // assert that we throw TableIsFullException only when the table is truly full.
+            // TODO: if we're sure after testing that the
+            //  sequence is full IFF the table is full, we can
+            //  decide to either check only by currSize at the
+            //  start of the method or to delete the field
+            //  currSize and check only if the sequence full
+            //  (as done before).
+
             throw new TableIsFullException(hte);
         }
 
