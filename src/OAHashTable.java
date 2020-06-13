@@ -51,7 +51,6 @@ public abstract class OAHashTable implements IHashTable {
                     firstDeletedIndex = ind;
                     sawDeleted = true;
                 }
-                break;
             } else if (table[ind].GetKey() == key) {
                 throw new KeyAlreadyExistsException(hte);
             }
