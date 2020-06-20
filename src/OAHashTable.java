@@ -3,16 +3,19 @@ import java.util.HashSet;
 public abstract class OAHashTable implements IHashTable {
 
     private HashTableElement[] table;
+    private int tableLength;
     private static final HashTableElement deleted = new HashTableElement(-1, -1);
-    private int currSize=0;
+    private int currSize;
 
     public OAHashTable(int m) {
-        this.table = new HashTableElement[m];
+        this.tableLength=m;
+        this.table = new HashTableElement[tableLength];
+        this.currSize=0;
     }
 
 
     private int findIndex(long key) {
-        for (int i = 0; i < table.length; i++) {
+        for (int i = 0; i < tableLength; i++) {
             int ind = Hash(key, i);
             if (table[ind] == null) {
                 return -1;
@@ -40,7 +43,7 @@ public abstract class OAHashTable implements IHashTable {
         long key = hte.GetKey();
         int firstDeletedIndex;
         boolean sawDeleted = false;
-        for (int i = 0; i < table.length; i++) {
+        for (int i = 0; i < tableLength; i++) {
             int ind = Hash(key, i);
             if (table[ind] == null) {
                 table[ind] = hte;
@@ -61,7 +64,7 @@ public abstract class OAHashTable implements IHashTable {
             table[firstDeletedIndex] = hte;
             currSize++;
         } else {
-            assert (currSize == table.length);
+            assert (currSize == tableLength);
             // assert that we throw TableIsFullException only when the table is truly full.
             // TODO: if we're sure after testing that the
             //  sequence is full IFF the table is full, we can
@@ -91,4 +94,8 @@ public abstract class OAHashTable implements IHashTable {
      * @return the index into the hash table to place the key x
      */
     public abstract int Hash(long x, int i);
+
+    protected int getTableLength() {
+        return tableLength;
+    }
 }
