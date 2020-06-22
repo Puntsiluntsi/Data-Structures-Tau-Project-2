@@ -8,8 +8,7 @@ public class DoubleHashTable extends OAHashTable {
     public DoubleHashTable(int m, long p) {
         super(m);
         baseHash = ModHash.GetFunc(m, p);
-        // TODO: realize how to make a stepHash function that always returns a number coprime to m,
-        //  as seen in the presentation (now m isn't necessarily prime, I think).
+        stepHash = ModHash.GetFunc(m - 1, p);
     }
 
     @Override
