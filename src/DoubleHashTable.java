@@ -10,7 +10,7 @@ public class DoubleHashTable extends OAHashTable {
 
     @Override
     public int Hash(long x, int i) {
-        return hashByStepFromBase(x,i*(stepHash.Hash(x) + 1));
+        return hashByStepFromBase(x,i*(stepHash.Hash(x)+1));
     }
 
 }

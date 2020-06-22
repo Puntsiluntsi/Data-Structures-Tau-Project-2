@@ -15,13 +15,12 @@ public class ModHash {
     }
 
     public static ModHash GetFunc(int m, long p) {
-        // TODO implement random choice of mod function from family
         ThreadLocalRandom rand = ThreadLocalRandom.current();
         return new ModHash(rand.nextLong(1, p), rand.nextLong(p), m, p);
     }
 
     public int Hash(long key) {
         // TODO implement hash function
-        return (int) ((a*key + b) % p) % m;
+        return (int) Math.floorMod(Math.floorMod(a*key + b, p), m);
     }
 }

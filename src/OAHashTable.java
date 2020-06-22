@@ -3,8 +3,10 @@ public abstract class OAHashTable implements IHashTable {
     private HashTableElement[] table;
     private int tableLength;
     private static final HashTableElement deleted = new HashTableElement(-1, -1);
-    private int currSize;
+    public int currSize;
     protected ModHash baseHash;
+
+    public boolean debug = false;
 
     public OAHashTable(int m) {
         this.tableLength=m;
@@ -12,7 +14,12 @@ public abstract class OAHashTable implements IHashTable {
         this.currSize=0;
     }
 
-
+    /**
+     * Finds the index of an element with a specified key in the table.
+     * @param key - the key of the element to find its index.
+     * @return the index in the table of the element with the specified key if exists,
+     *         else -1.
+     */
     private int findIndex(long key) {
         for (int i = 0; i < tableLength; i++) {
             int ind = Hash(key, i);
@@ -27,6 +34,11 @@ public abstract class OAHashTable implements IHashTable {
         return -1; // search sequence is full and doesn't contain key.
     }
 
+    /**
+     * Finds the element with a specified key in the table.
+     * @param key - the key of the element to find.
+     * @return the element with the specified key if exists, else null.
+     */
     @Override
     public HashTableElement Find(long key) {
         int ind = findIndex(key);
@@ -36,17 +48,21 @@ public abstract class OAHashTable implements IHashTable {
         return table[ind];
     }
 
+    /**
+     * Inserts an element into the table.
+     * @param hte - the element to insert.
+     * @throws TableIsFullException if there is no space in the element's key search sequence.
+     * @throws KeyAlreadyExistsException if the element's key is already in the table.
+     */
     @Override
     public void Insert(HashTableElement hte) throws TableIsFullException, KeyAlreadyExistsException {
-        //if (currSize == tableLength) {
-        //    throw new TableIsFullException(hte);
-        //}
-        // (see next TODO)
+        
 
         long key = hte.GetKey();
         int firstDeletedIndex=-1; // dummy value to fix variable not initialized error.
         boolean sawDeleted = false;
         for (int i = 0; i < tableLength; i++) {
+            if (debug) System.out.println(i);
             int ind = Hash(key, i);
             if (table[ind] == null) {
                 table[ind] = hte;
@@ -70,21 +86,16 @@ public abstract class OAHashTable implements IHashTable {
 
             currSize++;
         } else {
-            assert (currSize == tableLength);
-            // assert that we throw TableIsFullException only when the table is truly full.
-            // TODO: if we're sure after testing that the
-            //  sequence is full IFF the table is full, we can
-            //  decide to either check only by currSize at the
-            //  start of the method or to delete the field
-            //  currSize and check only if the sequence full
-            //  (as done before).
-
             throw new TableIsFullException(hte);
         }
 
     }
 
-
+    /**
+     * Deletes an element with a specified key from the table.
+     * @param key - the key of the element to delete.
+     * @throws KeyDoesntExistException if the key doesn't exist in the table.
+    */
     @Override
     public void Delete(long key) throws KeyDoesntExistException {
         int ind = findIndex(key);
@@ -92,12 +103,13 @@ public abstract class OAHashTable implements IHashTable {
             throw new KeyDoesntExistException(key);
         }
         table[ind] = deleted;
+        currSize--;
     }
 
     /**
-     * @param x - the key to hash
-     * @param i - the index in the probing sequence
-     * @return the index into the hash table to place the key x
+     * @param x - the key to hash.
+     * @param i - the index in the probing sequence.
+     * @return the index into the hash table to place the key x.
      */
     public abstract int Hash(long x, int i);
 
@@ -105,7 +117,13 @@ public abstract class OAHashTable implements IHashTable {
         return tableLength;
     }
 
+    /** returns the result of a hash function that is composed of the base hash
+     * function + a certain increment modulo the length of the table
+     * @param x - the key to hash.
+     * @param step - the step by which to increment.
+     * @return the result of the hash function described above.
+     */
     protected int hashByStepFromBase(long x, long step) {
-        return (int)(baseHash.Hash(x)+step)%tableLength;
+        return (int) Math.floorMod(baseHash.Hash(x)+step, tableLength);
     }
 }
