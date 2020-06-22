@@ -40,8 +40,13 @@ public abstract class OAHashTable implements IHashTable {
 
     @Override
     public void Insert(HashTableElement hte) throws TableIsFullException, KeyAlreadyExistsException {
+        //if (currSize == tableLength) {
+        //    throw new TableIsFullException(hte);
+        //}
+        // (see next TODO)
+
         long key = hte.GetKey();
-        int firstDeletedIndex;
+        int firstDeletedIndex=-1; // dummy value to fix variable not initialized error.
         boolean sawDeleted = false;
         for (int i = 0; i < tableLength; i++) {
             int ind = Hash(key, i);
@@ -62,6 +67,9 @@ public abstract class OAHashTable implements IHashTable {
         }
         if (sawDeleted) {
             table[firstDeletedIndex] = hte;
+            // after we checked that the key isn't already in the table we can
+            // insert it instead of the first deleted component in the table.
+
             currSize++;
         } else {
             assert (currSize == tableLength);
