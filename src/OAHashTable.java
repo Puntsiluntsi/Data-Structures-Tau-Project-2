@@ -1,11 +1,10 @@
-import java.util.HashSet;
-
 public abstract class OAHashTable implements IHashTable {
 
     private HashTableElement[] table;
     private int tableLength;
     private static final HashTableElement deleted = new HashTableElement(-1, -1);
     private int currSize;
+    protected ModHash baseHash;
 
     public OAHashTable(int m) {
         this.tableLength=m;
@@ -104,5 +103,9 @@ public abstract class OAHashTable implements IHashTable {
 
     protected int getTableLength() {
         return tableLength;
+    }
+
+    protected int hashByStepFromBase(long x, long step) {
+        return (int)(baseHash.Hash(x)+step)%tableLength;
     }
 }
