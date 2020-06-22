@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class LPHashTable extends OAHashTable {
 	
 	public LPHashTable(int m, long p) {

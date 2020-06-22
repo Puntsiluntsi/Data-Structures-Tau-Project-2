@@ -2,9 +2,11 @@ import java.util.Random;
 
 public class QPHashTable extends OAHashTable {
 
+	private ModHash baseHash;
 	public QPHashTable(int m, long p) {
 		super(m);
-		// TODO Complete hash table constructor.
+		baseHash = ModHash.GetFunc(m, p);
+
 	}
 	
 	@Override
