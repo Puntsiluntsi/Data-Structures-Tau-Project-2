@@ -10,6 +10,6 @@ public class QPHashTable extends OAHashTable {
 	@Override
 	public int Hash(long x, int i) {
 		// TODO implement hash function
-		return 0;
+		return (int) (((long)baseHash.Hash(x) + i)%getTableLength());
 	}
 }
