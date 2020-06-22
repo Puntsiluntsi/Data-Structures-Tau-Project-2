@@ -30,7 +30,6 @@ public abstract class OAHashTable implements IHashTable {
 
     @Override
     public HashTableElement Find(long key) {
-        // TODO implement find
         int ind = findIndex(key);
         if (ind == -1) {
             return null;
