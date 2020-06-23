@@ -7,15 +7,17 @@ public abstract class OAHashTable implements IHashTable {
     public HashTableElement[] table;
     private int tableLength;
     public static final HashTableElement deleted = new HashTableElement(-1, -1);
+
+    //TODO: remove currSize if unnecessary.
     public int currSize;
     protected ModHash baseHash;
 
-    public boolean debug = false;
+    public final boolean debug = false;
 
     public OAHashTable(int m) {
-        this.tableLength=m;
+        this.tableLength = m;
         this.table = new HashTableElement[tableLength];
-        this.currSize=0;
+        this.currSize = 0;
     }
 
 
@@ -89,18 +91,19 @@ public abstract class OAHashTable implements IHashTable {
     @Override
     public void Insert(HashTableElement hte) throws TableIsFullException, KeyAlreadyExistsException {
         long key = hte.GetKey();
-        currSize++;  // We assume for now that we can insert the key, if we don't we update size later
         for (int i = 0; i < tableLength; i++) {
             if (debug) System.out.println(i);
             int ind = Hash(key, i);
             if (table[ind] == null) {
-                    table[ind] = hte;
-                    return;
+                currSize++;
+                table[ind] = hte;
+                return;
             } else if (table[ind] == deleted) {
                 if (keyInSequenceStartingFrom(key, i + 1)) {
                     throw new KeyAlreadyExistsException(hte);
                 } else {
-                    table[ind]=hte;
+                    currSize++;
+                    table[ind] = hte;
                     return;
                 }
             } else if (table[ind].GetKey() == key) {
@@ -136,14 +139,18 @@ public abstract class OAHashTable implements IHashTable {
         return tableLength;
     }
 
-    /** returns the result of a hash function that is composed of the base hash
+    /**
+     * returns the result of a hash function that is composed of the base hash
      * function + a certain increment modulo the length of the table
+     *
      * @param x - the key to hash.
      * @param step - the step by which to increment.
+     * @pre step>=0.
      * @return the result of the hash function described above.
      */
     protected int hashByStepFromBase(long x, long step) {
-        return (int) Math.floorMod(baseHash.Hash(x)+step, getTableLength());
+        assert step >= 0;
+        return (int) ((baseHash.Hash(x) + step) % getTableLength());
         //TODO: compare complexity of floorMod to normal mod
     }
 

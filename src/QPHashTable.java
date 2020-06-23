@@ -8,6 +8,6 @@ public class QPHashTable extends OAHashTable {
 	
 	@Override
 	public int Hash(long x, int i) {
-		return hashByStepFromBase(x,i*i);
+		return hashByStepFromBase(x,(long)i*i);
 	}
 }

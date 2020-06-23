@@ -7,7 +7,8 @@ public class AQPHashTable extends OAHashTable {
 
     @Override
     public int Hash(long x, int i) {
-        int currStepSize = i * i;
-        return hashByStepFromBase(x, ((i & 1) == 0 ? currStepSize : -currStepSize));
+
+        int currStepSize = (i * i)%getTableLength();
+        return hashByStepFromBase(x, ((i & 1) == 0 ? currStepSize : getTableLength()-currStepSize));
     }
 }
