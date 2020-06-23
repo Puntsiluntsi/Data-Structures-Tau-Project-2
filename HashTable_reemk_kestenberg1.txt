@@ -9,26 +9,66 @@
 - Size of Q2 is 6571
 
 ### Section B
+- Exceptions in QPHashTable: 90
+- Exceptions in AQPHashTable: 0
 
-- Exceptions in QP: 90
-- Exceptions in AQP: 0
+The search sequence of an element in QPHashTable is Q1 (from section A) plus some constant (the 
+element's hash), therefore QP checks 3286 places (~half the table) when searching for a suitable 
+place to insert an element. So when we try to fill up the whole table, we would likely get 
+`TableIsFull` errors because all the places in the element's search sequence were taken (because 
+the search sequence only contains half the table's indexes)
 
-The search sequence of an element in QP is Q1 (from section A) plus some constant 
-(the element's hash), therefore QP checks 3286 places (~half the table) when 
-searching for a suitable place to insert an element.
-So when we try to fill up the whole table, we would likely get _TableIsFull_ errors
-because all the places in the element's search sequence were taken (because the 
-search sequence only contains half the table's indexes)
-
-The search sequence of AQP is Q2 (from section A) plus some constant (the element's 
-hash), therefore QP checks 6571 places (the whole table) when searching for a 
-suitable place to insert an element.
-So the search sequence for each element is the whole table, therefore we would only 
-get _TableIsFull_ errors when the whole table is full - This never happens because we 
-only insert m elements (the size of the table) and not a single element extra.
-That is why we got 0 errors.
+The search sequence of AQPHashTable is Q2 (from section A) plus some constant (the element's hash), 
+therefore QP checks 6571 places (the whole table) when searching for a suitable place to insert an 
+element. So the search sequence for each element is the whole table, therefore we would only get 
+`TableIsFull` errors when the whole table is full - This never happens because we only insert m 
+elements (the size of the table) and not a single element extra. That is why we got 0 errors.
 
 ------------------------------
 ## Experiment 4
 ### Section A
+ Class             | Running Time 
+-------------------|--------------
+ `LPHashTable`     | 2.141 sec
+ `QPHashTable`     | 2.515 sec
+ `AQPHashTable`    | 2.179 sec
+ `DoubleHashTable` | 1.107 sec
 
+We see that the main difference in running time is that of `DoubleHashTable` compared to the other tables.
+This short running time is obtained by `DoubleHashTable`'s use of a secondary hash function to 
+determine the step from the base hash function - unlike the rest of the tables, in which the step 
+is not determined by the key. In this way, `DoubleHashTable` minimizes collisions because even if two 
+elements are hashed to the same cell, they have different search sequences.
+
+ ### Section B
+ Class             | Running Time 
+-------------------|--------------
+ `LPHashTable`     | 5.082 sec
+ `AQPHashTable`    | 2.733 sec
+ `DoubleHashTable` | 3.183 sec
+
+ We don't run `QPHashTable` because this time we add a number of elements that is bigger than half the table size, and as we saw in experiment 3, this can cause `QPHashTable` to throw `TableIsFull` exceptions - which, as instructed, are not supposed to be thrown in this experiment.
+
+ The long running time of `LPHashTable` reveals it's limitation when the table becomes close to full. Since the search sequence of an element in linear probing is consecutive, cluster are formed in the table. As we insert more elements, these clusters are getting longer. When the table is getting close to full (like in this experiment), different clusters begin to merge, forming even larger clusters and further lengthening the running time of additional inserts. This is portrayed in the results by the long running time of `LPHashTable`.
+ This problem of merging clusters was not apparent in the previous results because we inserted way less elements, so the chances of clusters merging together were lower.
+
+------------------------------
+## Experiment 5
+ Iterations         | Running Time 
+--------------------|--------------
+ First 3 iterations | 6.926 sec
+ Last 3 iterations  | 26.319 sec
+
+The difference in running time stems from the fact that as we perform more iterations, the hash 
+table is filled with more `deleted` marks due the elements we delete at each iteration.
+In the last 3 iterations, each iteration starts with significantly more cells in the hash table 
+that are marked `deleted` than in the first 3 iterations. Now, the more `deleted` cells in the 
+table >>> the more cells that are scanned when inserting a new element >>> the more time required 
+for a single insert operation, hence the longer running time.
+Another intuitive way of thinking about it is that each `deleted` mark is treated just like an 
+ordinary taken cell when scanning the table to find a place to insert an element.
+And we already know from experiment 4 that the fuller the hash table, the longer it takes for each insert.
+
+
+
+ 
