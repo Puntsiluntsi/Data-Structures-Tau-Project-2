@@ -1,3 +1,7 @@
+//TODO END: remove these imports when finishing
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public abstract class OAHashTable implements IHashTable {
 
     public HashTableElement[] table;
@@ -14,14 +18,19 @@ public abstract class OAHashTable implements IHashTable {
         this.currSize=0;
     }
 
+
     /**
-     * Finds the index of an element with a specified key in the table.
+     * Finds the index of an element with a specified key in the table,
+     * searching starting at a specified probe number.
      * @param key - the key of the element to find its index.
-     * @return the index in the table of the element with the specified key if exists,
-     *         else -1.
+     * @param startProbe - the probe number to start searching from in the probing sequence;
+     *                     i.e the search is preformed on indices Hash(key,startProbe),...,Hash(key,m-1).
+     * @return the index in the table of the element with the specified key if it is found in
+     *         the probing sequence, else -1.
      */
-    private int findIndex(long key) {
-        for (int i = 0; i < tableLength; i++) {
+    private int findIndexStartingFrom(long key, int startProbe) {
+        assert (0 <= startProbe && startProbe < tableLength);
+        for (int i = startProbe; i < tableLength; i++) {
             int ind = Hash(key, i);
             if (table[ind] == null) {
                 return -1;
@@ -32,6 +41,29 @@ public abstract class OAHashTable implements IHashTable {
             }
         }
         return -1; // search sequence is full and doesn't contain key.
+    }
+
+    /**
+     * Finds the index of an element with a specified key in the table.
+     * @param key - the key of the element to find its index.
+     * @return the index in the table of the element with the specified key if exists,
+     *         else -1.
+     */
+    private int findIndex(long key) {
+        return findIndexStartingFrom(key, 0);
+    }
+
+    /**
+     * Checks if a specified key is to be found at its probe sequence,
+     * starting from a specified probe number.
+     * @param key - the key of the element to find its index.
+     * @param startProbe - the probe number to start searching from in the probing sequence;
+     *                     i.e the search is preformed on indices Hash(key,startProbe),...,Hash(key,m-1).
+     * @return the index in the table of the element with the specified key if it is found in
+     *         the probing sequence, else -1.
+     */
+    private boolean keyInSequenceStartingFrom(long key, int startProbe) {
+        return findIndexStartingFrom(key, startProbe) != -1;
     }
 
     /**
@@ -56,45 +88,26 @@ public abstract class OAHashTable implements IHashTable {
      */
     @Override
     public void Insert(HashTableElement hte) throws TableIsFullException, KeyAlreadyExistsException {
-        
-
         long key = hte.GetKey();
-        int firstDeletedIndex=-1; // -1 means we did not found a deleted mark.
         currSize++;  // We assume for now that we can insert the key, if we don't we update size later
         for (int i = 0; i < tableLength; i++) {
             if (debug) System.out.println(i);
             int ind = Hash(key, i);
             if (table[ind] == null) {
-                if (firstDeletedIndex == -1) {
-                    // We found an available place and did not encounter a deleted place
-                    // before. therefore we will insert the element here.
                     table[ind] = hte;
                     return;
-                }
-                // We already found a deleted mark before, so we will insert there.
-                table[firstDeletedIndex] = hte;
-                return;
-
             } else if (table[ind] == deleted) {
-                // we can not immediately insert at this position,
-                // since key can still be already in the table later in the search sequence.
-                if (firstDeletedIndex == -1)
-                    firstDeletedIndex = ind;
+                if (keyInSequenceStartingFrom(key, i + 1)) {
+                    throw new KeyAlreadyExistsException(hte);
+                } else {
+                    table[ind]=hte;
+                    return;
+                }
             } else if (table[ind].GetKey() == key) {
-                currSize--;  // We didn't manage to insert the key so we will decrease the size.
                 throw new KeyAlreadyExistsException(hte);
             }
         }
-        if (firstDeletedIndex != -1) {
-            table[firstDeletedIndex] = hte;
-            // after we checked that the key isn't already in the table we can
-            // insert it instead of the first deleted component in the table.
-
-        } else {
-            currSize--;  // We didn't manage to insert the key so we will decrease the size.
-            throw new TableIsFullException(hte);
-        }
-
+        throw new TableIsFullException(hte);
     }
 
     /**
@@ -130,6 +143,13 @@ public abstract class OAHashTable implements IHashTable {
      * @return the result of the hash function described above.
      */
     protected int hashByStepFromBase(long x, long step) {
-        return (int) Math.floorMod(baseHash.Hash(x)+step, tableLength);
+        return (int) Math.floorMod(baseHash.Hash(x)+step, getTableLength());
+        //TODO: compare complexity of floorMod to normal mod
+    }
+
+    // TODO END: remove at the end
+    @Override
+    public String toString() {
+        return IntStream.range(0, tableLength).filter(i -> table[i] != null).mapToObj(i -> "" + i + ": " + (table[i] == deleted ? "[DELETED]" : Long.toString(table[i].GetKey()))).collect(Collectors.joining(", "));
     }
 }
