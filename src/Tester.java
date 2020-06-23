@@ -3,11 +3,11 @@ import java.time.Duration;
 import java.time.Instant;
 
 
-public class Tester{
-    public static void main(String[] args) throws Exception{
-        Random rand = new Random();
+public class Tester {
+    public static void main(String[] args) throws Exception {
         int m = 10000000;
         int p = 1000000007;
+        Random rand = new Random();
 		Instant start, finish;
         ModHash baseHash = ModHash.GetFunc(m, p);
         ModHash stepHash = ModHash.GetFunc(m - 1, p);
@@ -44,11 +44,19 @@ public class Tester{
         System.out.println("it took "+Duration.between(start, finish).toMillis()/times);
                 // x = (int) Math.floorMod(baseHash.Hash(i)+((i & 1) == 0 ? i*i : -i*i), m);
 
+        //        m = 419;
+        //        p = 1549;
+        //        for (IHashTable hashtable : new IHashTable[]
+        //                {new LPHashTable(m, p), /*new QPHashTable(m,p),*/ new AQPHashTable(m, p), new DoubleHashTable(m, p)}) {
+        //            for (int i = 0; i < m - 50; i++) {
+        //                hashtable.Insert(new HashTableElement(i, i));
+        //            }
+        //            hashtable.Delete(6);
+        //            //            HashTableElement hte = hashtable.Find(6);
+        //            HashTableElement hte = hashtable.Find(7);
+        //            System.out.println(hte == null ? hte : hte.GetValue());
+        //        }
+        //
 
-        
-        // int m=6; long p = 23;
-        // IHashTable[] arr = new IHashTable[] {new LPHashTable(m,p), new QPHashTable(m,p), new AQPHashTable(m,p), new DoubleHashTable(m,p)};
-        // IHashTable[] arr = new IHashTable[] {new QPHashTable(m,p)};
-        // for (IHashTable hashtable : arr) {}
     }
 }
