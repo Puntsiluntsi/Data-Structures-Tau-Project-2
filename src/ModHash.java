@@ -20,7 +20,6 @@ public class ModHash {
     }
 
     public int Hash(long key) {
-        // TODO implement hash function
-        return (int) Math.floorMod(Math.floorMod(a*key + b, p), m);
+        return (int) ((a*key + b) % p) % m;
     }
 }

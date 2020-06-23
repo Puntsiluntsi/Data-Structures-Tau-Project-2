@@ -1,8 +1,8 @@
 public abstract class OAHashTable implements IHashTable {
 
-    private HashTableElement[] table;
+    public HashTableElement[] table;
     private int tableLength;
-    private static final HashTableElement deleted = new HashTableElement(-1, -1);
+    public static final HashTableElement deleted = new HashTableElement(-1, -1);
     public int currSize;
     protected ModHash baseHash;
 
@@ -59,33 +59,39 @@ public abstract class OAHashTable implements IHashTable {
         
 
         long key = hte.GetKey();
-        int firstDeletedIndex=-1; // dummy value to fix variable not initialized error.
-        boolean sawDeleted = false;
+        int firstDeletedIndex=-1; // -1 means we did not found a deleted mark.
+        currSize++;  // We assume for now that we can insert the key, if we don't we update size later
         for (int i = 0; i < tableLength; i++) {
             if (debug) System.out.println(i);
             int ind = Hash(key, i);
             if (table[ind] == null) {
-                table[ind] = hte;
-                currSize++;
+                if (firstDeletedIndex == -1) {
+                    // We found an available place and did not encounter a deleted place
+                    // before. therefore we will insert the element here.
+                    table[ind] = hte;
+                    return;
+                }
+                // We already found a deleted mark before, so we will insert there.
+                table[firstDeletedIndex] = hte;
                 return;
+
             } else if (table[ind] == deleted) {
                 // we can not immediately insert at this position,
                 // since key can still be already in the table later in the search sequence.
-                if (!sawDeleted) {
+                if (firstDeletedIndex == -1)
                     firstDeletedIndex = ind;
-                    sawDeleted = true;
-                }
             } else if (table[ind].GetKey() == key) {
+                currSize--;  // We didn't manage to insert the key so we will decrease the size.
                 throw new KeyAlreadyExistsException(hte);
             }
         }
-        if (sawDeleted) {
+        if (firstDeletedIndex != -1) {
             table[firstDeletedIndex] = hte;
             // after we checked that the key isn't already in the table we can
             // insert it instead of the first deleted component in the table.
 
-            currSize++;
         } else {
+            currSize--;  // We didn't manage to insert the key so we will decrease the size.
             throw new TableIsFullException(hte);
         }
 
