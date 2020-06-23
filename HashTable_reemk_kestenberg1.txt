@@ -52,6 +52,9 @@ elements are hashed to the same cell, they have different search sequences.
  The long running time of `LPHashTable` reveals it's limitation when the table becomes close to full. Since the search sequence of an element in linear probing is consecutive, cluster are formed in the table. As we insert more elements, these clusters are getting longer. When the table is getting close to full (like in this experiment), different clusters begin to merge, forming even larger clusters and further lengthening the running time of additional inserts. This is portrayed in the results by the long running time of `LPHashTable`.
  This problem of merging clusters was not apparent in the previous results because we inserted way less elements, so the chances of clusters merging together were lower.
 
+ This time, we observe that `AQPHashTable` ran faster than `DoubleHashTable`, that can be explained:
+ `DoubleHashTable` uses a hash function to calculate the step of the search sequence, while `AQPHashTable` uses a simple calculation. The modulo operations of `DoubleHashTable`'s step hash function are more expensive than `AQPHashTable`'s calculation, so when using `DoubleHashTable` we trade the efficiency of our search sequence calculation for a more sophisticated search sequence that results in fewer collisions. This trade does not benefit us in the case that we fill up a large portion of the table (the above results are when filling 95% of the table). Because then, collisions are much more frequent, so we will be calculating a larger portion of the search sequence. Therefore it becomes more profitable to have an efficient way of calculating the search sequence (at the cost of more collisions) than to have a search sequence that is heavy to compute but avoids more collisions. That's the reason `DoubleHashTable` ran slower than `AQPHashTable`.
+
 ------------------------------
 ## Experiment 5
  Iterations         | Running Time 
