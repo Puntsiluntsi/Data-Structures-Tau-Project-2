@@ -13,7 +13,6 @@ public class Tester {
 
         int m = 10000000;
         int p = 1000000007;
-        Random rand = new Random();
         Instant start, finish;
         ModHash baseHash = ModHash.GetFunc(m, p);
         ModHash stepHash = ModHash.GetFunc(m - 1, p);
@@ -62,7 +61,7 @@ public class Tester {
         System.out.println("Started AQP opt 2");
         for (int j = 0; j < times; j++)
             for (int i = 0; i < m; i++)
-                x = (int) Math.floorMod((long) baseHash.Hash(i) + ((i&1) == 0 ? (i*i)%m : -(i*i)%m, m);
+                x = (int) Math.floorMod((long) baseHash.Hash(i) + ((i&1) == 0 ? (i*i)%m : -(i*i)%m), m);
         finish = Instant.now();
         System.out.println("it took " + Duration.between(start, finish).toMillis()/times);
 
