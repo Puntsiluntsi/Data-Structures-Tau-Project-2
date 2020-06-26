@@ -1,24 +1,15 @@
-//TODO END: remove these imports when finishing
-import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 public abstract class OAHashTable implements IHashTable {
 
-    public HashTableElement[] table;
+    private HashTableElement[] table;
     private int tableLength;
-    public static final HashTableElement deleted = new HashTableElement(-1, -1);
+    private static final HashTableElement deleted = new HashTableElement(-1, -1);
 
-    //TODO: remove currSize if unnecessary.
-    public int currSize;
     protected ModHash baseHash;
 
-    public final boolean debug = false;
 
     public OAHashTable(int m) {
         this.tableLength = m;
         this.table = new HashTableElement[tableLength];
-        this.currSize = 0;
     }
 
 
@@ -93,17 +84,14 @@ public abstract class OAHashTable implements IHashTable {
     public void Insert(HashTableElement hte) throws TableIsFullException, KeyAlreadyExistsException {
         long key = hte.GetKey();
         for (int i = 0; i < tableLength; i++) {
-            if (debug) System.out.println(i);
             int ind = Hash(key, i);
             if (table[ind] == null) {
-                currSize++;
                 table[ind] = hte;
                 return;
             } else if (table[ind] == deleted) {
                 if (keyInSequenceStartingFrom(key, i + 1)) {
                     throw new KeyAlreadyExistsException(hte);
                 } else {
-                    currSize++;
                     table[ind] = hte;
                     return;
                 }
@@ -126,7 +114,6 @@ public abstract class OAHashTable implements IHashTable {
             throw new KeyDoesntExistException(key);
         }
         table[ind] = deleted;
-        currSize--;
     }
 
     /**
@@ -152,14 +139,5 @@ public abstract class OAHashTable implements IHashTable {
     protected int hashByStepFromBase(long x, long step) {
         assert step >= 0;
         return (int) ((baseHash.Hash(x) + step) % getTableLength());
-        //TODO: compare complexity of floorMod to normal mod
-    }
-
-    // TODO END: remove at the end
-    @Override
-    public String toString() {
-        return IntStream.range(0, tableLength).filter(i -> table[i] != null).mapToObj(i->i)
-                .sorted(Comparator.comparingLong(i -> table[i].GetKey()))
-                .map(i -> "" /*+ i + ": "*/ + (table[i] == deleted ? "[DELETED]" : Long.toString(table[i].GetKey()))).collect(Collectors.joining(", "));
     }
 }
