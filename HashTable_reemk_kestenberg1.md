@@ -9,16 +9,16 @@
 - Size of Q2 is 6571
 
 ### Section B
-- Exceptions in QPHashTable: 90
-- Exceptions in AQPHashTable: 0
+- Exceptions in `QPHashTable`: 90
+- Exceptions in `AQPHashTable`: 0
 
-The set of indices in the probe sequence of an element in QPHashTable is Q1 (from section A)
+The set of indices in the probe sequence of an element in `QPHashTable` is Q1 (from section A)
 with some constant added (the element's hash); therefore, in QP we check |Q1|=3286 indices (~half the table)
 when searching for a vacant place to insert the element in. Consequently, as the table gets filled,
 there is a non-negligible chance that the probe sequence will contain only occupied indices (up to
 a probability close to 1/2 when there is one free slot left), resulting in a `TableIsFullError`.
 
-On the other hand, the set of indices in AQPHashTable's probe sequences is Q2 (from section A) again with the
+On the other hand, the set of indices in `AQPHashTable`'s probe sequences is Q2 (from section A) again with the
 element's hash added, which means that every such probe sequence contains 6571 indices - the whole table.
 Therefore, we only get `TableIsFull` errors when the whole table is full, and in our case, this never happens
 because we only insert m elements (the size of the table) and not a single element extra. That is why we got 0 errors.
@@ -27,7 +27,8 @@ because we only insert m elements (the size of the table) and not a single eleme
 Every prime number p>2 has (p+1)/2 quadratic residues mod p (including 0). The set Q1 is exactly the set of quadratic
 residues mod m=6751, which is prime. It is obviously a set of quadratic residues per definition because it is defined
 as the remainder of an integer i squared mod p. It contains ALL the quadratic residues because for every integer x>m,
-there exists some i<m for which x is equivalent to i mod m, which also means that x squared is equivalent to i squared
+there exists some i&lt;m
+for which x is equivalent to i mod m, which also means that x squared is equivalent to i squared
 mod m - and i squared mod m is a member of Q1. This is why Q1 has exactly (m+1)/2=(6751+1)/2=3286 elements, causing the
 probe sequence in QP to only contain half (rounded up) of the table's indices.
 For m=2, every integer is a quadratic residue mod m, so the probe sequence will contain all 2 indices. This is the only
