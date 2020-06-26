@@ -22,16 +22,17 @@ public interface IHashTable {
 	 * @return the table entry with the required key if exists, or null otherwise.
 	 */
 	public HashTableElement Find(long key);
-	
-	public class TableIsFullException extends Exception{
+
+	//TODO: change back to "extends Exception" instead of RuntimeException even though these should be unchecked
+	public class TableIsFullException extends RuntimeException{
 		public HashTableElement hte;
 		
 		public TableIsFullException(HashTableElement hte) {	
 			this.hte=hte;
 		}
 	}
-	
-	public class KeyAlreadyExistsException extends Exception{
+
+	public class KeyAlreadyExistsException extends RuntimeException{
 		public HashTableElement hte;
 		
 		public KeyAlreadyExistsException(HashTableElement hte) {
@@ -39,7 +40,7 @@ public interface IHashTable {
 		}
 	}
 	
-	public class KeyDoesntExistException extends Exception{
+	public class KeyDoesntExistException extends RuntimeException{
 		public long key;
 		
 		public KeyDoesntExistException(long key) {

@@ -1,4 +1,5 @@
 //TODO END: remove these imports when finishing
+import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -157,6 +158,8 @@ public abstract class OAHashTable implements IHashTable {
     // TODO END: remove at the end
     @Override
     public String toString() {
-        return IntStream.range(0, tableLength).filter(i -> table[i] != null).mapToObj(i -> "" + i + ": " + (table[i] == deleted ? "[DELETED]" : Long.toString(table[i].GetKey()))).collect(Collectors.joining(", "));
+        return IntStream.range(0, tableLength).filter(i -> table[i] != null).mapToObj(i->i)
+                .sorted(Comparator.comparingLong(i -> table[i].GetKey()))
+                .map(i -> "" /*+ i + ": "*/ + (table[i] == deleted ? "[DELETED]" : Long.toString(table[i].GetKey()))).collect(Collectors.joining(", "));
     }
 }
