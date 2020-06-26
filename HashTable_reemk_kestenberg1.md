@@ -46,11 +46,9 @@ m>2 we have seen that it does occur.
  `AQPHashTable`    | 1.069 sec
  `DoubleHashTable` | 1.356 sec
 
-We can see that the main difference in running time is that of `DoubleHashTable` compared to the other tables.
-This short running time is obtained by `DoubleHashTable`'s use of a secondary hash function to 
-determine the step from the base hash function - unlike the rest of the tables, in which the step 
-is not determined by the key. In this way, `DoubleHashTable` minimizes collisions because even if two 
-elements are hashed to the same cell, they have different search sequences.
+In this case, the simpler the implementation (computationally), the better the performance. This is because collisions aren't very likely when inserting only half of the full capacity, which makes the simpler, easier to compute implementations better because the trade-off for less collisions isn't worth it.
+LPHashTable is the fastest because it's probe sequence indices are the easiest to compute, and it has minimal cache misses. QPHashTable follows by being the next most simple to compute and AQPHashTable comes after, possibly for being a little more complicated than QPHashTable. DoubleHashTable is the slowest because computing the two hash functions is the most computationally expensive amongst the implementations.
+
 
  ### Section B
  Class             | Running Time 
@@ -59,13 +57,15 @@ elements are hashed to the same cell, they have different search sequences.
  `AQPHashTable`    | 5.948 sec
  `DoubleHashTable` | 7.727 sec
 
- We don't run `QPHashTable` because this time we add a number of elements that is bigger than half the table size, and as we saw in experiment 3, this can cause `QPHashTable` to throw `TableIsFull` exceptions - which, as instructed, are not supposed to be thrown in this experiment.
+We don't run `QPHashTable` because this time we add a number of elements that is bigger than half the table size, and as we saw in experiment 3, this can cause `QPHashTable` to throw `TableIsFull` exceptions - which, as instructed, are not supposed to be thrown in this experiment.
 
- The long running time of `LPHashTable` reveals it's limitation when the table becomes close to full. Since the search sequence of an element in linear probing is consecutive, cluster are formed in the table. As we insert more elements, these clusters are getting longer. When the table is getting close to full (like in this experiment), different clusters begin to merge, forming even larger clusters and further lengthening the running time of additional inserts. This is portrayed in the results by the long running time of `LPHashTable`.
- This problem of merging clusters was not apparent in the previous results because we inserted way less elements, so the chances of clusters merging together were lower.
+The long running time of `LPHashTable` reveals it's limitation when the table becomes close to full. Since the search sequence of an element in linear probing is consecutive, clusters are formed in the table. As we insert more elements, those clusters get longer. While the table is getting close to being full (like in this experiment), different clusters begin to merge, forming even larger clusters and further lengthening the running time of additional inserts.
+ This problem of merging clusters was not as apparent in the previous results because we inserted much less elements, so the length of clusters and their chances of merging together were lower.
 
- This time, we observe that `AQPHashTable` ran faster than `DoubleHashTable`, that can be explained:
- `DoubleHashTable` uses a hash function to calculate the step of the search sequence, while `AQPHashTable` uses a simple calculation. The modulo operations of `DoubleHashTable`'s step hash function are more expensive than `AQPHashTable`'s calculation, so when using `DoubleHashTable` we trade the efficiency of our search sequence calculation for a more sophisticated search sequence that results in fewer collisions. This trade does not benefit us in the case that we fill up a large portion of the table (the above results are when filling 95% of the table). Because then, collisions are much more frequent, so we will be calculating a larger portion of the search sequence. Therefore it becomes more profitable to have an efficient way of calculating the search sequence (at the cost of more collisions) than to have a search sequence that is heavy to compute but avoids more collisions. That's the reason `DoubleHashTable` ran slower than `AQPHashTable`.
+`DoubleHashTable` outperforms `LPHashTable` because of it's use of a secondary hash function to determine the step between following probe indices; this way, `DoubleHashTable` minimizes collisions because even if two elements are hashed to the same cell, they are likely to have different search sequences (the step hash and base hash are independent).
+
+ Finally, we observe that `AQPHashTable` ran the fastest. that can be explained:
+ `DoubleHashTable` uses a hash function to calculate the step of the search sequence, while `AQPHashTable` uses a simple calculation. The modulo operations of `DoubleHashTable`'s step hash function are more expensive than `AQPHashTable`'s calculation, so when using `DoubleHashTable` we trade the efficiency of our search sequence calculation for a more sophisticated search sequence that results in fewer collisions. This trade does not benefit us in the case that we fill up a large portion of the table (the above results are when filling 95% of the table) - because then, collisions are much more frequent, so we will be calculating a larger portion of the search sequence. Therefore it becomes more profitable to have an efficient way of calculating the search sequence (at the cost of more collisions) than to have a search sequence that is heavy to compute but avoids more collisions. On the other hand, `AQPHashTable` does not create large clusters and this is why it manages to perform well, unlike `LPHashTable`. `AQPHashTable` takes the middle ground between computational simplicity and collision minimization, which works best in this case.
 
 ------------------------------
 ## Experiment 5
@@ -77,9 +77,9 @@ elements are hashed to the same cell, they have different search sequences.
 The difference in running time stems from the fact that as we perform more iterations, the hash 
 table is filled with more `deleted` marks due the elements we delete at each iteration.
 In the last 3 iterations, each iteration starts with significantly more cells in the hash table 
-that are marked `deleted` than in the first 3 iterations. Now, the more `deleted` cells in the 
-table >>> the more cells that are scanned when inserting a new element >>> the more time required 
-for a single insert operation, hence the longer running time.
+that are marked `deleted` than in the first 3 iterations. The more `deleted` cells in the
+table >>> the more cells that are expected to be scanned when inserting a new element >>> the more time required
+for insert operations, hence the longer running time.
 Another intuitive way of thinking about it is that each `deleted` mark is treated just like an 
 ordinary taken cell when scanning the table to find a place to insert an element.
 And we already know from experiment 4 that the fuller the hash table, the longer it takes for each insert.
