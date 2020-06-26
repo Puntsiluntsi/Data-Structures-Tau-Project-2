@@ -9,7 +9,7 @@
 - Size of Q2 is 6571
 
 ### Section B
-- Exceptions in `QPHashTable`: 90
+- Exceptions in `QPHashTable`: 83
 - Exceptions in `AQPHashTable`: 0
 
 The set of indices in the probe sequence of an element in `QPHashTable` is Q1 (from section A)
@@ -41,10 +41,10 @@ m>2 we have seen that it does occur.
 ### Section A
  Class             | Running Time 
 -------------------|--------------
- `LPHashTable`     | 2.141 sec
- `QPHashTable`     | 2.515 sec
- `AQPHashTable`    | 2.179 sec
- `DoubleHashTable` | 1.107 sec
+ `LPHashTable`     | 0.751 sec
+ `QPHashTable`     | 0.739 sec
+ `AQPHashTable`    | 1.069 sec
+ `DoubleHashTable` | 1.356 sec
 
 We can see that the main difference in running time is that of `DoubleHashTable` compared to the other tables.
 This short running time is obtained by `DoubleHashTable`'s use of a secondary hash function to 
@@ -55,9 +55,9 @@ elements are hashed to the same cell, they have different search sequences.
  ### Section B
  Class             | Running Time 
 -------------------|--------------
- `LPHashTable`     | 5.082 sec
- `AQPHashTable`    | 2.733 sec
- `DoubleHashTable` | 3.183 sec
+ `LPHashTable`     | 11.123 sec
+ `AQPHashTable`    | 5.948 sec
+ `DoubleHashTable` | 7.727 sec
 
  We don't run `QPHashTable` because this time we add a number of elements that is bigger than half the table size, and as we saw in experiment 3, this can cause `QPHashTable` to throw `TableIsFull` exceptions - which, as instructed, are not supposed to be thrown in this experiment.
 
@@ -71,8 +71,8 @@ elements are hashed to the same cell, they have different search sequences.
 ## Experiment 5
  Iterations         | Running Time 
 --------------------|--------------
- First 3 iterations | 6.926 sec
- Last 3 iterations  | 26.319 sec
+ First 3 iterations | 9.521 sec
+ Last 3 iterations  | 33.813 sec
 
 The difference in running time stems from the fact that as we perform more iterations, the hash 
 table is filled with more `deleted` marks due the elements we delete at each iteration.
