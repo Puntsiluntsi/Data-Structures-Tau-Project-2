@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class QPHashTable extends OAHashTable {
 
 	public QPHashTable(int m, long p) {

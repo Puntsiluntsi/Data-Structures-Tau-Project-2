@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class DoubleHashTable extends OAHashTable {
 
     private ModHash stepHash;
